@@ -1,0 +1,55 @@
+function [s] = Joint_space_equations(X0,Xf,tf)
+syms q1 q2 q3 q4 q5 l1 l2 l3 l4 l5 Q1(t) Q2(t) Q3(t) Q4(t) Q5(t) t c0 c1 c2 c3 Q_T
+%syms C01 C11 a C31 C02 C12 C22 C32 C03 C13 C23 C33 C04 C14 C24 C34 C05 C15 C25 C35 
+q=[q1 q2 q3 q4 q5]';
+q_0=[1; 2; 3; 4; 5];
+l=[0 2 2 0 0];
+T0_1=transformation_func(q(1),l(1),0,270);
+T1_2=transformation_func(q(2),0,l(2),0);
+T2_3=transformation_func(q(3),0,l(3),0);
+T3_4=transformation_func(q(4),0,0,90);
+T4_5=transformation_func(q(5),l(4)+l(5),0,0);
+%Total transformation matrix
+T0_5=T0_1*T1_2*T2_3*T3_4*T4_5;
+end_effector_pos=end_effector_position(T0_5);
+J=dFi_dqi(end_effector_pos);
+q_x0=inverse_position_kinematics(1,q_0,l,J,end_effector_pos,X0);
+q_xf=inverse_position_kinematics(1,q_0,l,J,end_effector_pos,Xf);
+double(q_x0);
+double(q_xf);
+q_x0_dot=[0;0;0;0;0];
+q_xf_dot=[0;0;0;0;0];
+for i=1:5
+c0=q_x0(i);
+c1=q_x0_dot;
+eqns=[c0+c1*tf+c2*tf^2+c3*tf^3==q_xf(i), c1+2*tf*c2+3*tf^2*c3==q_xf_dot];
+vars=[c2 c3];
+[C2,C3]=solve(eqns,vars);
+%Q_T=double(c0)+double(c1)*t+double(C2)*t^2+double(C3)*t^3
+end
+% %For Q1(t)
+% C01=q_x0(1); C02=q_x0(2); C03=q_x0(3); C04=q_x0(4); C05=q_x0(5);
+% C11=q_x0_dot(1); C12=q_x0_dot(2); C13=q_x0_dot(3); C14=q_x0_dot(4); C15=q_x0_dot(5);
+% eqns=[C01+tf^2*C21+tf^3*C31==q_xf(1), 2*C21*tf+3*C31*tf^2==q_xf_dot(1)];
+% solve(eqns,[C21 C31])
+% %For Q2(t)
+% eqns=[C02+C22*tf^2+C32*tf^3==q_xf(2),2*C22*tf+3*C32*tf^2==q_xf_dot(2)];
+% vars=[C22,C23];
+% [C22,C32]=solve(eqns,vars);
+% %For Q3(t)
+% eqns=[C03+C23*tf^2+C33*tf^3==q_xf(3),2*C23*tf+3*C33*tf^2==q_xf_dot(3)];
+% vars=[C23,C33];
+% [C23,C33]=solve(eqns,vars);
+% %For Q4(t)
+% eqns=[C04+C24*tf^2+C34*tf^3==q_xf(4),2*C24*tf+3*C34*tf^2==q_xf_dot(4)];
+% vars=[C24,C34];
+% [C24,C34]=solve(eqns,vars);
+% %For Q5(t)
+% eqns=[C05+C25*tf^2+C35*tf^3==q_xf(5),2*C25*tf+3*C35*tf^2==q_xf_dot(5)];
+% vars=[C25,C35];
+% [C25,C35]=solve(eqns,vars);
+% Q1(t)=C01+C11*t+C21*t^2+C31*t^3
+% Q2(t)=C02+C12*t+C22*t^2+C32*t^3
+% Q3(t)=C03+C13*t+C23*t^2+C33*t^3
+% Q4(t)=C04+C14*t+C24*t^2+C34*t^3
+% Q5(t)=C05+C15*t+C25*t^2+C35*t^3

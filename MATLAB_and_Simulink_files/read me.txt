@@ -1,0 +1,21 @@
+The potential_energy code is used in order to get the potential energy of each link in the robot according to the centriod of the
+the link. In order to operate the code, you need to insert the code in this formate potential_energy(q, m) where q is the 
+vector of joint angles and m is the vector of masses of each joint, the result should be the U vector containing the 
+potentail energy of each of the links of the robot.
+
+The kinemtic_energy code is used in order to get the kinetic energy of each link in the robot by differentiating the
+centriod position of each link then multiply it by half the transformation function of each link.
+In order to operate the code, you need to insert the code in this formate kinemtic_energy(q, qdot, m, I) where q is a vector
+joint angles, qdot is the vector of the velocities of each joint, m is the vector of masses of each joint and I is the
+vector of inertia tensor for each link. The output T is a vector having the kinetic energy of each link for the simulated robot.
+
+The lagrange code is used to get the Lagrangian equation from the obtained potential and
+kinetic energy of each link. In order to operate the code, you need to insert the code in this form lagrange(), 
+the function has no inputs as it calls the potential_energy function and the kinemtic_energy function then it subtracts them
+from each other. The output is then a vector containing the lagrangian equation for each link of the robot.
+
+the Torques code is used to calculate the torques required for each joint. In order to operate the code, you need to insert the code in this formate
+Torques(L, q, qdot), where L is is the lagrangian function obtained from the lagrange() function, q is the vector containing angles of each joint
+and qdot is the vector of velocities of each joint. the output is a vector containing the torques of each link, (note that this matrix 
+will be very big so we printed it in a T.txt file to be as organised as possible) 
+
